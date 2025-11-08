@@ -1,0 +1,26 @@
+<textarea id="code" placeholder="Skriv Lua-kod här..."></textarea>
+<button id="createRaw">Skapa raw-länk</button>
+<input id="rawLink" readonly>
+
+<script>
+document.getElementById('createRaw').addEventListener('click', async () => {
+  const code = document.getElementById('code').value;
+  if(!code.trim()){ alert('Skriv Lua-kod först'); return; }
+  const filename = 'script.lua';
+  const resp = await fetch('/api/create-gist', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ code, filename })
+  });
+  const data = await resp.json();
+  if(data.raw){
+    document.getElementById('rawLink').value = data.raw;
+    document.getElementById('rawLink').select();
+    document.execCommand('copy');
+    alert('Raw-länk skapad och kopierad!');
+  } else {
+    alert('Fel vid skapande av Gist');
+    console.error(data);
+  }
+});
+</script>
